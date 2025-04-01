@@ -1,0 +1,21 @@
+{
+    "name": "sws/module-customorderprocessing",
+    "description": "Custom Order Processing",
+    "type": "magento2-module",
+    "authors": [
+        {
+            "name": "Vikas Mehar",
+            "email": "vikasmehar@icloud.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Sws\\CustomOrderProcessing\\": ""
+        }
+    }
+}
