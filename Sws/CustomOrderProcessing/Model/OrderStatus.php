@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
+
 namespace Sws\CustomOrderProcessing\Model;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Sws\CustomOrderProcessing\Api\OrderStatusInterface;
-use Magento\Sales\Model\Order;
 use Magento\Framework\Exception\LocalizedException;
 
 class OrderStatus implements OrderStatusInterface

@@ -7,7 +7,6 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Mail\Template\TransportBuilder;
-use Magento\Sales\Model\Order;
 use Psr\Log\LoggerInterface;
 
 /**

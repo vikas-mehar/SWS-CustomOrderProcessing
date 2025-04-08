@@ -3,4 +3,28 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework/ObjectManager/etc/config.xsd">
     <preference for="Sws\CustomOrderProcessing\Api\OrderStatusInterface"
                 type="Sws\CustomOrderProcessing\Model\OrderStatus"/>
+    <preference for="Sws\CustomOrderProcessing\Api\OrderStatusLogRepositoryInterface"
+                type="Sws\CustomOrderProcessing\Model\OrderStatusLogRepository"/>
+    <preference for="Sws\CustomOrderProcessing\Api\Data\OrderStatusLogInterface"
+                type="Sws\CustomOrderProcessing\Model\OrderStatusLog"/>
+    <preference for="Sws\CustomOrderProcessing\Api\Data\OrderStatusLogSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="Sws\CustomOrderProcessing\Model\ResourceModel\OrderStatusLog\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sws_order_status_log</argument>
+            <argument name="resourceModel" xsi:type="string">
+                Sws\CustomOrderProcessing\Model\ResourceModel\OrderStatusLog\Collection
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="sws_customorderprocessing_orderstatuslog_listing_data_source" xsi:type="string">
+                    Sws\CustomOrderProcessing\Model\ResourceModel\OrderStatusLog\Grid\Collection
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>
