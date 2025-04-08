@@ -54,6 +54,9 @@ Event Observer
 -	Logs order status changes into the database.
 -	Sends an email notification when an order is marked as shipped.
 
+Admin Grid to view logs
+- SWS -> Order Status Log
+
 Uninstallation
 - bin/magento module:disable Sws_CustomOrderProcessing
 - bin/magento setup:upgrade
