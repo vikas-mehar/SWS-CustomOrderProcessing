@@ -1,89 +1,85 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Sws\CustomOrderProcessing\Test\Unit\Model;
 
 use PHPUnit\Framework\TestCase;
-use Sws\CustomOrderProcessing\Model\OrderStatus;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Sws\CustomOrderProcessing\Model\OrderStatus;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Sales\Api\Data\OrderInterface;
 
 class OrderStatusTest extends TestCase
 {
+    /**
+     * @var OrderRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
     private $orderRepositoryMock;
-    private $orderMock;
-    private OrderStatus $orderStatus;
+
+    /**
+     * @var OrderStatus
+     */
+    private $orderStatus;
 
     protected function setUp(): void
     {
         $this->orderRepositoryMock = $this->createMock(OrderRepositoryInterface::class);
-
-        $this->orderMock = $this->getMockBuilder(OrderInterface::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['getId', 'setStatus'])
-            ->getMock();
-
         $this->orderStatus = new OrderStatus($this->orderRepositoryMock);
     }
 
-    public function testUpdateStatusSuccessfullyUpdatesOrderStatus(): void
+    public function testUpdateStatusSuccessfully()
     {
         $incrementId = '100000001';
-        $status = 'processing';
-
-        $this->orderRepositoryMock->expects($this->once())
-            ->method('get')
-            ->with($incrementId)
-            ->willReturn($this->orderMock);
-
-        $this->orderMock->expects($this->once())
-            ->method('getId')
-            ->willReturn(101);
-
-        $this->orderMock->expects($this->once())
-            ->method('setStatus')
-            ->with($status)
-            ->willReturnSelf();
-
-        $this->orderRepositoryMock->expects($this->once())
-            ->method('save')
-            ->with($this->orderMock);
-
-        $result = $this->orderStatus->updateStatus($incrementId, $status);
-
-        $this->assertSame($this->orderMock, $result);
-    }
-
-    public function testUpdateStatusThrowsNoSuchEntityExceptionWhenOrderNotFound(): void
-    {
-        $this->expectException(NoSuchEntityException::class);
-        $this->expectExceptionMessage('Order not found.');
-
-        $this->orderRepositoryMock->expects($this->once())
-            ->method('get')
-            ->willThrowException(new NoSuchEntityException(__('Order not found.')));
-
-        $this->orderStatus->updateStatus('999999', 'pending');
-    }
-
-    public function testUpdateStatusThrowsLocalizedExceptionOnGenericFailure(): void
-    {
-        $incrementId = '100000002';
         $status = 'complete';
 
-        $this->orderRepositoryMock->method('get')->willReturn($this->orderMock);
-        $this->orderMock->method('getId')->willReturn(102);
-        $this->orderMock->method('setStatus')->willReturnSelf();
+        // Create a mock order
+        $orderMock = $this->createMock(OrderInterface::class);
+        $orderMock->method('getId')->willReturn(1);
+        $orderMock->method('setStatus')->with($status);
 
-        $this->orderRepositoryMock->expects($this->once())
-            ->method('save')
-            ->willThrowException(new \Exception('DB failure'));
+        // Expect the order repository to return the mock order
+        $this->orderRepositoryMock->method('get')->with($incrementId)->willReturn($orderMock);
+        $this->orderRepositoryMock->expects($this->once())->method('save')->with($orderMock);
 
+        // Call the method
+        $result = $this->orderStatus->updateStatus($incrementId, $status);
+
+        // Assert that the returned order is the same as the mock order
+        $this->assertSame($orderMock, $result);
+    }
+
+    public function testUpdateStatusOrderNotFound()
+    {
+        $this->expectException(NoSuchEntityException::class);
+        $this->expectExceptionMessage(__('Order not found.'));
+
+        $incrementId = '100000002';
+
+        // Expect the order repository to throw NoSuchEntityException
+        $this->orderRepositoryMock->method('get')->with($incrementId)->willThrowException(new NoSuchEntityException(__('Order not found.')));
+
+        // Call the method
+        $this->orderStatus->updateStatus($incrementId, 'complete');
+    }
+
+    public function testUpdateStatusGeneralException()
+    {
         $this->expectException(LocalizedException::class);
-        $this->expectExceptionMessage('Something went wrong');
+        $this->expectExceptionMessage('Something went wrong: Test exception');
 
-        $this->orderStatus->updateStatus($incrementId, $status);
+        $incrementId = '100000003';
+
+        // Create a mock order
+        $orderMock = $this->createMock(OrderInterface::class);
+        $orderMock->method('getId')->willReturn(1);
+
+        // Expect the order repository to return the mock order
+        $this->orderRepositoryMock->method('get')->with($incrementId)->willReturn($orderMock);
+        $this->orderRepositoryMock->method('save')->willThrowException(new \Exception('Test exception'));
+
+        // Call the method
+        $this->orderStatus->updateStatus($incrementId, 'complete');
     }
 }
